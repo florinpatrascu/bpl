@@ -1,0 +1,109 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift( File.join( File.dirname(__FILE__), 'lib' ) )
+
+require "date"
+require "bundler/setup"
+require 'yajl'
+require 'active_record'
+require "lib_trollop"
+require "bpl"
+require "models/blood_pressure"
+require "create_blood"
+require 'tablizer'
+require "chronic"
+
+# Simple Blood Pressure logger
+# 
+# Florin, 2012.10.15
+
+
+SUB_COMMANDS = %w(history series delete view init plot)
+
+# db_config = YAML::load(File.open(File.join(File.dirname(__FILE__),
+#   '../config','database.yml'))) [ENV['ENV'] ? ENV['ENV'] : 'development']
+# ActiveRecord::Base.establish_connection(db_config)
+
+ActiveRecord::Base.establish_connection :adapter  => "sqlite3",
+                                        :database => File.expand_path("~/.bp/blood.sqlite3")
+opts = Trollop::options do
+  banner <<-BANNER
+  Simple blood pressure logger
+  
+  Available commands: #{SUB_COMMANDS.join(", ")}
+  
+  Examples:
+     
+     $ bpl 145/81/67/L/87 -d 2012/12/10 -t 16:30 -m notes
+     $ bpl 136/60/66
+     $ bpl 136/60/66/r
+     $ bpl view --all     
+     $ bpl 125/71/67/L/87 -d 2012/12/11 -m "some notes" 
+     $ bpl 136/60/66/l/85
+     $ bpl 120/64/67/L/87 -D "2012/12/10 16:30"
+     $ bpl export -r -a 
+     $ bpl export -d 2012/08/01 -f > my_bp.csv
+
+  The following options apply:
+  BANNER
+  
+  now = Time.now
+  
+  opt :date,     "Date", :short => "-d", :default => now.strftime("%Y/%m/%d"), :type => String
+  opt :time,     "Time", :short => "-t", :default => now.strftime("%H:%M:%S"), :type => String
+  opt :datetime, "Specify the date and the time, surrounded with quotes \";",  :short => "-D", :type => String
+  opt :message,  "Notes, comments", :short => "-m", :type => String
+  opt :force,    "Force database initialization, all the data will be lost", :short => "-f"
+  opt :raw,      "used to view the data without formatting", :short => "-r", :default => false
+  opt :page,     "total number of records to view", :short => "-p", :default => 15, :type => Integer
+  opt :all,      "export the entire dataset, all the records", :short => "-a", :default => false
+  opt :quiet,    "no echoing to console", :short => "-q", :default => false
+  
+end
+
+include Bpl
+Bpl.options opts
+
+# Check the command line parameters
+cmd = ARGV.shift # get the subcommand 
+
+# optimize the two regex and build a clever one to rule them all :)
+# use http://rubular.com, to validate
+# hints: http://strugglingwithruby.blogspot.ca/2009/05/regular-expressions-in-ruby.html
+case cmd
+when /^(\d+)\/(\d+)\/(\d+)(?:\/([lr]))(?:\/(\d+))$/i, /^(\d+)\/(\d+)\/(\d+)(?:\/([lr]))?$/i  
+  begin    
+    Bpl.add($1, $2, $3, $4, $5)
+  rescue => e
+    puts "Exception in BPL: #{e} at #{e.backtrace.join("\n")}"
+  end
+  
+when "history", "view"
+  Bpl.view
+  
+when "export"
+  puts Bpl.export
+      
+when "delete", "remove"
+  Bpl.remove ARGV[0]
+  
+when "init"
+  puts "Initializing the blood database ..."
+  begin
+    CreateBlood.up
+  rescue => e
+    if opts[:force]
+      # ActiveRecord::Base.connection.drop_database db_config["database"] rescue nil
+      CreateBlood.down    
+      CreateBlood.up
+      puts " - done."
+    else  
+      puts "error: #{e.message}"
+      puts "use -f, to force the process and overwrite the data. All your previous data will be lost!"
+    end
+  end
+  
+else
+  Trollop::die "unknown command #{cmd.inspect}"
+end
+
