@@ -1,4 +1,4 @@
-require "version"
+require "bpl/version"
 require 'yajl'
 require "models/blood_pressure"
 require "csv"

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-$LOAD_PATH.unshift( File.join( File.dirname(__FILE__), 'lib' ) )
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), *%w[.. lib])
 
 require "date"
 require "bundler/setup"
@@ -8,6 +8,7 @@ require 'yajl'
 require 'active_record'
 require "lib_trollop"
 require "bpl"
+require "bpl/version"
 require "models/blood_pressure"
 require "create_blood"
 require 'tablizer'
