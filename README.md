@@ -61,7 +61,7 @@ A handful of command lines and switches are provided for your convenience.
     $ bpl view -d 08/14 -t 09:31:10
 
 **Remove**  
-- delete a record by record id. The record id can be observed with the **view** command. Example:
+delete a record by record id. The record id can be observed with the **view** command. Example:
 
     $ bpl view -d 08/14 -t 09:31:10
     +--+-------------------+---+---+--+-----+------+-----+
@@ -70,12 +70,14 @@ A handful of command lines and switches are provided for your convenience.
     |2 |2012-09-25 09:31:11|120|80 |67|LEFT |90    |     |
     |1 |2012-09-25 09:30:30|1  |2  |3 |RIGHT|90    |     |
     +--+-------------------+---+---+--+-----+------+-----+
-    
+
     $ bpl remove 1
     record: #1, was removed.
 
 **Export to CSV**  
-- export your data to a file that can be imported by other applications, including Numbers or Excel. Here is an example exporting the data to the screen:
+export your data to a file that can be imported by other applications, including Numbers or Excel. 
+
+Here is an example exporting the data to the screen:
 
     $ bpl export -d 9/14  
     ID,DATE,SYS,DIA,HR,ARM,WEIGHT,NOTES
@@ -87,39 +89,39 @@ And to a specified file:
     $
   
 **Init**  
-- use init with `-f` if you want to wipe out clean your local database. Warning, your data cannot be restored after this point in time. Example:
+use init with `-f` if you want to wipe out clean your local database. Warning, your data cannot be restored after this point in time. Example:
   
     $ bpl init -f
 
 **Help**
 
-      $ bpl -h
-      
-      Simple blood pressure logger
+    $ bpl -h
 
-      Available commands: history, series, delete, view, init, plot
+    Simple blood pressure logger
 
-      Examples:
+    Available commands: history, series, delete, view, init, plot
 
-         $ bpl 145/81/67/L/87 -d 2012/12/10 -t 16:30 -m notes
-         $ bpl 136/60/66
-         $ bpl 136/60/66/r
-         $ bpl 125/71/67/L/87 -d 2012/12/11 -m "some notes" 
-         $ bpl 136/60/66/l/85
-         $ bpl 120/64/67/L/87 -D "2012/12/10 16:30" 
-         $ bpl export -d 2012/08/01 -f > my_bp.csv
+    Examples:
 
-      The following options apply:
-          --date, -d <s>:   Date (default: 2012/10/31)
-          --time, -t <s>:   Time (default: 11:01:31)
-      --datetime, -D <s>:   Specify the date and the time, surrounded with quotes ";
-       --message, -m <s>:   Notes, comments
-             --force, -f:   Force database initialization, all the data will be lost
-               --raw, -r:   used to view the data without formatting
-          --page, -p <i>:   total number of records to view (default: 15)
-               --all, -a:   export the entire dataset, all the records
-             --quiet, -q:   no echoing to console
-              --help, -h:   Show this message
+       $ bpl 145/81/67/L/87 -d 2012/12/10 -t 16:30 -m notes
+       $ bpl 136/60/66
+       $ bpl 136/60/66/r
+       $ bpl 125/71/67/L/87 -d 2012/12/11 -m "some notes" 
+       $ bpl 136/60/66/l/85
+       $ bpl 120/64/67/L/87 -D "2012/12/10 16:30" 
+       $ bpl export -d 2012/08/01 -f > my_bp.csv
+
+    The following options apply:
+        --date, -d <s>:   Date (default: 2012/10/31)
+        --time, -t <s>:   Time (default: 11:01:31)
+    --datetime, -D <s>:   Specify the date and the time, surrounded with quotes ";
+     --message, -m <s>:   Notes, comments
+           --force, -f:   Force database initialization, all the data will be lost
+             --raw, -r:   used to view the data without formatting
+        --page, -p <i>:   total number of records to view (default: 15)
+             --all, -a:   export the entire dataset, all the records
+           --quiet, -q:   no echoing to console
+            --help, -h:   Show this message
       
 
 ### TODO
